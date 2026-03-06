@@ -96,6 +96,9 @@ local DefaultConfig = {
   hyperlinks = {
     sources = {},
   },
+  citations = {
+    sources = {},
+  },
   mappings = {
     disable_all = false,
     org_return_uses_meta_return = false,

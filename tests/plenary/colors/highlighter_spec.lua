@@ -266,37 +266,4 @@ describe('highlighter', function()
       assert_extmark(extmarks[1], { line = 2, start_col = 8, end_col = 17, hl_group = '@org.latex' })
     end)
   end)
-
-  describe('citation', function()
-    it('should highlight simple citation', function()
-      local extmarks = get_extmarks({
-        'See [cite:@key] for details',
-      })
-      assert.are.same(1, #extmarks)
-      assert_extmark(extmarks[1], { line = 0, start_col = 4, end_col = 15, hl_group = '@org.citation' })
-    end)
-
-    it('should highlight citation with style', function()
-      local extmarks = get_extmarks({
-        'See [cite/t:@key] for details',
-      })
-      assert.are.same(1, #extmarks)
-      assert_extmark(extmarks[1], { line = 0, start_col = 4, end_col = 17, hl_group = '@org.citation' })
-    end)
-
-    it('should highlight citation with multiple keys', function()
-      local extmarks = get_extmarks({
-        'See [cite:@key1;@key2] for details',
-      })
-      assert.are.same(1, #extmarks)
-      assert_extmark(extmarks[1], { line = 0, start_col = 4, end_col = 22, hl_group = '@org.citation' })
-    end)
-
-    it('should not highlight non-citation bracket expressions', function()
-      local extmarks = get_extmarks({
-        'This is [notacite:@key] text',
-      })
-      assert.are.same(0, #extmarks)
-    end)
-  end)
 end)

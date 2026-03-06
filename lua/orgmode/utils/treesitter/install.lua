@@ -5,7 +5,8 @@ local M = {
   compilers = { 'tree-sitter', vim.fn.getenv('CC'), 'cc', 'gcc', 'clang', 'cl', 'zig' },
 }
 
-local required_version = '2.0.2'
+local required_version = '2.0.3'
+local git_ref = 'copilot/add-citations-support'
 
 function M.install()
   local version_info = M.get_version_info()
@@ -271,7 +272,7 @@ function M.get_path(url, type)
 
   utils.notify(('%s tree-sitter grammar...'):format(msg[type]), { id = 'orgmode-treesitter-install' })
   return M.exe('git', {
-    args = { 'clone', '--filter=blob:none', '--depth=1', '--branch=' .. required_version, url, path },
+    args = { 'clone', '--filter=blob:none', '--depth=1', '--branch=' .. git_ref, url, path },
   }):next(function(code)
     if code ~= 0 then
       error('[orgmode] Failed to clone tree-sitter-org', 0)
@@ -283,7 +284,7 @@ end
 ---@param type? 'install' | 'update' | 'reinstall''
 ---@return OrgPromise<boolean>
 function M.run(type)
-  local url = 'https://github.com/nvim-orgmode/tree-sitter-org'
+  local url = 'https://github.com/NickHu/tree-sitter-org'
   local compiler = vim.tbl_filter(function(exe)
     return exe ~= vim.NIL and vim.fn.executable(exe) == 1
   end, M.compilers)[1]
