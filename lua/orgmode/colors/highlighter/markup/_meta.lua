@@ -1,7 +1,7 @@
 ---@meta
 ---@alias OrgMarkupRange { line: number, start_col: number, end_col: number }
 
----@alias OrgMarkupParserType 'emphasis' | 'link' | 'latex' | 'date'
+---@alias OrgMarkupParserType 'emphasis' | 'link' | 'latex' | 'date' | 'citation'
 
 ---@class OrgMarkupNode
 ---@field type OrgMarkupParserType

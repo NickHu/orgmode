@@ -2,7 +2,7 @@
 ---@field highlighter OrgHighlighter
 ---@field private cache table
 ---@field private query vim.treesitter.Query
----@field private parsers { emphasis: OrgEmphasisHighlighter, link: OrgLinkHighlighter, latex: OrgLatexHighlighter }
+---@field private parsers { emphasis: OrgEmphasisHighlighter, footnote: OrgFootnotesHighlighter, latex: OrgLatexHighlighter, citation: OrgCitationHighlighter }
 local OrgMarkup = {}
 
 ---@param opts { highlighter: OrgHighlighter }
@@ -23,6 +23,7 @@ function OrgMarkup:_init_highlighters()
   self.parsers = {
     emphasis = require('orgmode.colors.highlighter.markup.emphasis'):new({ markup = self }),
     footnote = require('orgmode.colors.highlighter.markup.footnotes'):new({ markup = self }),
+    citation = require('orgmode.colors.highlighter.markup.citation'):new({ markup = self }),
     latex = require('orgmode.colors.highlighter.markup.latex'):new({ markup = self }),
   }
 end
@@ -43,7 +44,7 @@ end
 ---@param line number
 ---@param tree TSTree
 ---@param use_cache? boolean
----@return { emphasis: OrgMarkupHighlight[], link: OrgMarkupHighlight[], latex: OrgMarkupHighlight[], date: OrgMarkupHighlight[] }
+---@return { emphasis: OrgMarkupHighlight[], footnote: OrgMarkupHighlight[], latex: OrgMarkupHighlight[], citation: OrgMarkupHighlight[] }
 function OrgMarkup:_get_highlights(bufnr, line, tree, use_cache)
   local line_content = vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]
 
@@ -72,12 +73,13 @@ end
 ---@param root_node TSNode
 ---@param source number | string
 ---@param line number
----@return { emphasis: OrgMarkupHighlight[], link: OrgMarkupHighlight[], latex: OrgMarkupHighlight[], date: OrgMarkupHighlight[] }
+---@return { emphasis: OrgMarkupHighlight[], footnote: OrgMarkupHighlight[], latex: OrgMarkupHighlight[], citation: OrgMarkupHighlight[] }
 function OrgMarkup:get_node_highlights(root_node, source, line)
   local result = {
     emphasis = {},
     latex = {},
     footnote = {},
+    citation = {},
   }
   ---@type OrgMarkupNode[]
   local entries = {}
