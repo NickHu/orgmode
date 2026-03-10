@@ -1,18 +1,12 @@
 local config = require('orgmode.config')
 
----Module-level parse cache: absolute path -> { mtime_sec, items }
 ---@type table<string, { mtime_sec: number, items: OrgCitationItem[] }>
 local _cache = {}
 
----Parse a BibTeX file and return OrgCitationItem[].
----Only the citation key is extracted; the description is left nil to keep the
----parser simple and dependency-free.
----@param content string  raw file content
+---@param content string
 ---@return OrgCitationItem[]
 local function parse_bibtex(content)
   local items = {}
-  -- @type{key, ...}  or  @type(key, ...)
-  -- Key runs to the first comma, closing brace/paren, or whitespace.
   for entry_type, key in content:gmatch('@(%a%w*)%s*[{(]%s*([^%s,}%)]+)') do
     local lt = entry_type:lower()
     if lt ~= 'string' and lt ~= 'preamble' and lt ~= 'comment' then
@@ -22,8 +16,7 @@ local function parse_bibtex(content)
   return items
 end
 
----Read and parse a .bib file, using a mtime-based cache to avoid re-parsing.
----@param path string  absolute, readable file path
+---@param path string
 ---@return OrgCitationItem[]
 local function parse_file(path)
   local stat = vim.uv.fs_stat(path)
@@ -41,10 +34,9 @@ local function parse_file(path)
   return items
 end
 
----Resolve a raw bibliography path to an absolute path.
----@param raw string  path as written in config or #+bibliography: directive
----@param base_dir? string  directory used to resolve relative paths (default: CWD)
----@return string  absolute (possibly non-existent) path
+---@param raw string
+---@param base_dir? string
+---@return string
 local function resolve_path(raw, base_dir)
   raw = vim.trim(raw)
   if raw:sub(1, 1) == '~' then
@@ -81,7 +73,7 @@ function OrgCitationBibtex:get_items()
   return items
 end
 
----Open the .bib file at the line of the given citation key.
+---Open the .bib file at the entry for the given key.
 ---@param key string
 ---@return boolean
 function OrgCitationBibtex:follow(key)
@@ -96,10 +88,7 @@ function OrgCitationBibtex:follow(key)
   return false
 end
 
----Return the list of resolved, readable .bib file paths.
----Sources (in order):
----  1. Global `citations.bibliography` config option (string or string[])
----  2. File-local `#+bibliography:` directives in the current org file
+---Collect readable .bib paths from the global config and file-local #+bibliography: directives.
 ---@private
 ---@return string[]
 function OrgCitationBibtex:_get_bib_paths()
@@ -114,7 +103,6 @@ function OrgCitationBibtex:_get_bib_paths()
     end
   end
 
-  -- 1. Global bibliography
   local global = config.citations.bibliography
   if global then
     if type(global) == 'string' then
@@ -126,14 +114,12 @@ function OrgCitationBibtex:_get_bib_paths()
     end
   end
 
-  -- 2. File-local #+bibliography: directives
   if self.files then
     local current_filename = vim.fn.expand('%:p')
     if current_filename ~= '' then
       local file = self.files:load_file_sync(current_filename)
       if file then
         local file_dir = vim.fn.fnamemodify(file.filename, ':p:h')
-        -- _get_directive with all_matches=true returns all values for the directive
         local directives = file:_get_directive('bibliography', true)
         if directives then
           if type(directives) == 'string' then
@@ -150,7 +136,6 @@ function OrgCitationBibtex:_get_bib_paths()
   return paths
 end
 
----Return the 1-indexed line number of the entry header for `key`, or nil.
 ---@private
 ---@param path string
 ---@param key string
@@ -158,8 +143,6 @@ end
 function OrgCitationBibtex:_find_key_line(path, key)
   local lines = vim.fn.readfile(path)
   local escaped = vim.pesc(key)
-  -- The key must be followed by a delimiter (comma, closing brace/paren, whitespace)
-  -- or be at end of line, to avoid matching keys that are prefixes of longer keys.
   local suffix_pat = '[%s,}%)]'
   for i, line in ipairs(lines) do
     if line:match('@%a%w*%s*[{(]%s*' .. escaped .. suffix_pat)

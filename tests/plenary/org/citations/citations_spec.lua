@@ -23,7 +23,9 @@ describe('OrgCitations', function()
     it('should register a citation source', function()
       local citations = OrgCitations:new()
       citations:add_source(make_source('test', {}))
-      assert.are.same(1, #citations.sources)
+      -- 'bibtex' is registered by default; 'test' is the extra one
+      assert.truthy(citations.sources_by_name['bibtex'])
+      assert.truthy(citations.sources_by_name['test'])
     end)
 
     it('should error when registering a source with a duplicate name', function()
@@ -96,57 +98,6 @@ describe('OrgCitations', function()
 
       citations:follow('k')
       assert.are.same({ 'src1:k', 'src2:k' }, calls)
-    end)
-  end)
-
-  describe('_at_cursor_pattern', function()
-    -- Helper: mock cursor position on a given line
-    local function mock_cursor(line_text, col_1indexed)
-      vim.api.nvim_buf_set_lines(0, 0, -1, false, { line_text })
-      vim.api.nvim_win_set_cursor(0, { 1, col_1indexed - 1 }) -- nvim uses 0-indexed col
-    end
-
-    before_each(function()
-      vim.cmd('new')
-    end)
-
-    after_each(function()
-      vim.cmd('bwipeout!')
-    end)
-
-    it('should return nil when not inside a citation', function()
-      local citations = OrgCitations:new()
-      mock_cursor('plain text @key here', 17)
-      assert.is_nil(citations:_at_cursor_pattern())
-    end)
-
-    it('should return the key when cursor is on @key in [cite:@key]', function()
-      local citations = OrgCitations:new()
-      -- "See [cite:@smith2020] for details"
-      -- col 15 is inside "smith2020" (1-indexed)
-      mock_cursor('See [cite:@smith2020] for details', 15)
-      local key = citations:_at_cursor_pattern()
-      assert.are.same('smith2020', key)
-    end)
-
-    it('should return the key for styled citations [cite/t:@key]', function()
-      local citations = OrgCitations:new()
-      mock_cursor('[cite/t:@key2022]', 12)
-      local key = citations:_at_cursor_pattern()
-      assert.are.same('key2022', key)
-    end)
-
-    it('should return the key when cursor is directly on @', function()
-      local citations = OrgCitations:new()
-      mock_cursor('[cite:@key]', 7) -- col 7 is on '@'
-      local key = citations:_at_cursor_pattern()
-      assert.are.same('key', key)
-    end)
-
-    it('should return nil for [notcite:@key]', function()
-      local citations = OrgCitations:new()
-      mock_cursor('[notcite:@key]', 11)
-      assert.is_nil(citations:_at_cursor_pattern())
     end)
   end)
 end)

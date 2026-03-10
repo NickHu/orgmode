@@ -8,10 +8,6 @@ OrgCompletionCitations.__index = OrgCompletionCitations
 function OrgCompletionCitations:new(opts)
   return setmetatable({
     completion = opts.completion,
-    -- Match [cite: or [cite/style: followed by optional text, then @ and the
-    -- in-progress key.  \zs marks the start of the completion base.
-    -- Use level-1 long string [=[ ]=] to avoid the Lua long-string ]] terminator
-    -- being triggered by \]] inside the Vim character class [^\]].
     pattern = vim.regex([=[\[cite[/:][^\]]*@\zs[^ \]]*$]=]),
   }, OrgCompletionCitations)
 end

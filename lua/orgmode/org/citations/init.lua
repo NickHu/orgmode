@@ -20,7 +20,6 @@ function OrgCitations:new(opts)
   return this
 end
 
----Register a citation source.
 ---@param source OrgCitationSource
 function OrgCitations:add_source(source)
   if self.sources_by_name[source:get_name()] then
@@ -30,7 +29,6 @@ function OrgCitations:add_source(source)
   table.insert(self.sources, source)
 end
 
----Return all citation items from every registered source.
 ---@return OrgCitationItem[]
 function OrgCitations:get_items()
   local items = {}
@@ -40,8 +38,6 @@ function OrgCitations:get_items()
   return items
 end
 
----Attempt to navigate to the bibliography entry with the given key.
----Each registered source is tried in order; the first one that returns true wins.
 ---@param key string
 ---@return boolean
 function OrgCitations:follow(key)
@@ -53,47 +49,17 @@ function OrgCitations:follow(key)
   return false
 end
 
----Return the citation key under the current cursor position, or nil if not on a citation.
----Prefers the tree-sitter `citation_reference` node (available with the updated grammar);
----falls back to line-pattern matching for compatibility with older parser versions.
 ---@return string | nil
 function OrgCitations:at_cursor()
-  -- Try tree-sitter citation_reference node first (available with updated grammar)
   local node = ts_utils.closest_node(ts_utils.get_node(), { 'citation_reference' })
-  if node then
-    local key_node = node:field('key')[1]
-    if key_node then
-      return vim.treesitter.get_node_text(key_node, 0)
-    end
-  end
-
-  return self:_at_cursor_pattern()
-end
-
----@private
----Fallback pattern-based cursor detection for use with older grammar versions
----that do not yet expose `citation_reference` nodes.
----@return string | nil
-function OrgCitations:_at_cursor_pattern()
-  local line = vim.api.nvim_get_current_line()
-  local col = vim.api.nvim_win_get_cursor(0)[2] + 1 -- convert 0-indexed column to 1-indexed
-
-  local before_cursor = line:sub(1, col)
-  local after_cursor = line:sub(col + 1)
-
-  -- Must be inside a [cite:...] or [cite/style:...] context
-  if not before_cursor:match('%[cite[/:]') then
+  if not node then
     return nil
   end
-
-  -- Cursor must be on or after '@'
-  local key_prefix = before_cursor:match('@([^%s%]%;,@]*)$')
-  if key_prefix == nil then
+  local key_node = node:field('key')[1]
+  if not key_node then
     return nil
   end
-
-  local key_suffix = after_cursor:match('^([^%s%]%;,@]*)')
-  return key_prefix .. (key_suffix or '')
+  return vim.treesitter.get_node_text(key_node, 0)
 end
 
 ---@private

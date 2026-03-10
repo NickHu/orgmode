@@ -2,7 +2,7 @@
 ---@field highlighter OrgHighlighter
 ---@field private cache table
 ---@field private query vim.treesitter.Query
----@field private parsers { emphasis: OrgEmphasisHighlighter, footnote: OrgFootnotesHighlighter, latex: OrgLatexHighlighter }
+---@field private parsers { emphasis: OrgEmphasisHighlighter, link: OrgLinkHighlighter, latex: OrgLatexHighlighter }
 local OrgMarkup = {}
 
 ---@param opts { highlighter: OrgHighlighter }
@@ -43,7 +43,7 @@ end
 ---@param line number
 ---@param tree TSTree
 ---@param use_cache? boolean
----@return { emphasis: OrgMarkupHighlight[], footnote: OrgMarkupHighlight[], latex: OrgMarkupHighlight[] }
+---@return { emphasis: OrgMarkupHighlight[], link: OrgMarkupHighlight[], latex: OrgMarkupHighlight[], date: OrgMarkupHighlight[] }
 function OrgMarkup:_get_highlights(bufnr, line, tree, use_cache)
   local line_content = vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]
 
@@ -72,7 +72,7 @@ end
 ---@param root_node TSNode
 ---@param source number | string
 ---@param line number
----@return { emphasis: OrgMarkupHighlight[], footnote: OrgMarkupHighlight[], latex: OrgMarkupHighlight[] }
+---@return { emphasis: OrgMarkupHighlight[], link: OrgMarkupHighlight[], latex: OrgMarkupHighlight[], date: OrgMarkupHighlight[] }
 function OrgMarkup:get_node_highlights(root_node, source, line)
   local result = {
     emphasis = {},

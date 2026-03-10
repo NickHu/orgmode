@@ -135,9 +135,7 @@ describe('OrgCitationBibtex', function()
 end)
 
 describe('OrgCompletionCitations regex', function()
-  it('should be instantiable (no Lua syntax error in regex string)', function()
-    -- This test would have failed before the [=[ ]=] fix because the pattern
-    -- string was silently truncated by the Lua long-string ]] terminator.
+  it('should be instantiable', function()
     local completion_mock = { citations = nil }
     local ok, result = pcall(OrgCompletionCitations.new, OrgCompletionCitations, {
       completion = completion_mock,
@@ -151,9 +149,8 @@ describe('OrgCompletionCitations regex', function()
     local source = OrgCompletionCitations:new({ completion = completion_mock })
     local context = { line = '[cite:@smith' }
     local start = source:get_start(context)
-    -- \zs is placed after @, so match_str returns the 0-based byte offset of 's'
     assert.truthy(start)
-    assert.are.same(7, start) -- 0-based: [=0 c=1 i=2 t=3 e=4 :=5 @=6 s=7
+    assert.are.same(7, start)
   end)
 
   it('should match a styled citation line', function()
@@ -162,7 +159,6 @@ describe('OrgCompletionCitations regex', function()
     local context = { line = '[cite/t:@doe' }
     local start = source:get_start(context)
     assert.truthy(start)
-    -- [=0, c=1, i=2, t=3, e=4, /=5, t=6, :=7, @=8, d=9
     assert.are.same(9, start)
   end)
 
