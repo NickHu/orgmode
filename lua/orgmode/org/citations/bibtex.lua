@@ -103,7 +103,7 @@ function OrgCitationBibtex:_get_bib_paths()
     end
   end
 
-  local global = config.citations.bibliography
+  local global = config.citations.org_cite_global_bibliography
   if global then
     if type(global) == 'string' then
       add(global, nil)
@@ -146,7 +146,7 @@ function OrgCitationBibtex:_find_key_line(path, key)
   local suffix_pat = '[%s,}%)]'
   for i, line in ipairs(lines) do
     if line:match('@%a%w*%s*[{(]%s*' .. escaped .. suffix_pat)
-      or line:match('@%a%w*%s*[{(]%s*' .. escaped .. '$')
+        or line:match('@%a%w*%s*[{(]%s*' .. escaped .. '$')
     then
       return i
     end

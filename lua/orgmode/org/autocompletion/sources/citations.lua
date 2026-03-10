@@ -23,9 +23,9 @@ function OrgCompletionCitations:get_start(context)
   return self.pattern:match_str(context.line)
 end
 
----@param context OrgCompletionContext
+---@param _ OrgCompletionContext
 ---@return string[]
-function OrgCompletionCitations:get_results(context)
+function OrgCompletionCitations:get_results(_)
   local citations = self.completion.citations
   if not citations then
     return {}

@@ -1,7 +1,7 @@
 ---@class OrgCompletion
 ---@field files OrgFiles
 ---@field links OrgLinks
----@field citations OrgCitations | nil
+---@field citations OrgCitations
 ---@field private sources OrgCompletionSource[]
 ---@field private sources_by_name table<string, OrgCompletionSource>
 ---@field private fuzzy_match? boolean does completeopt has fuzzy option
@@ -11,7 +11,7 @@ local OrgCompletion = {
 }
 OrgCompletion.__index = OrgCompletion
 
----@param opts { files: OrgFiles, links: OrgLinks, citations?: OrgCitations }
+---@param opts { files: OrgFiles, links: OrgLinks, citations: OrgCitations }
 function OrgCompletion:new(opts)
   local this = setmetatable({
     files = opts.files,

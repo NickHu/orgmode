@@ -22,7 +22,7 @@ local Footnote = require('orgmode.objects.footnote')
 ---@field agenda OrgAgenda
 ---@field files OrgFiles
 ---@field links OrgLinks
----@field citations OrgCitations | nil
+---@field citations OrgCitations
 ---@field completion OrgCompletion
 local OrgMappings = {}
 

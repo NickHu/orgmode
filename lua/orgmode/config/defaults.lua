@@ -98,7 +98,7 @@ local DefaultConfig = {
   },
   citations = {
     sources = {},
-    bibliography = nil, ---@type string|string[]|nil Path(s) to global BibTeX file(s)
+    org_cite_global_bibliography = {},
   },
   mappings = {
     disable_all = false,

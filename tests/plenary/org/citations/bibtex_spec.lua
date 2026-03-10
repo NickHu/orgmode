@@ -15,10 +15,10 @@ describe('OrgCitationBibtex', function()
     it('should return keys from a configured .bib file', function()
       local source = OrgCitationBibtex:new({ files = nil })
       local config = require('orgmode.config')
-      local old = config.citations.bibliography
-      config.citations.bibliography = refs_bib
+      local old = config.citations.org_cite_global_bibliography
+      config.citations.org_cite_global_bibliography = refs_bib
       local items = source:get_items()
-      config.citations.bibliography = old
+      config.citations.org_cite_global_bibliography = old
 
       local keys = vim.tbl_map(function(i)
         return i.key
@@ -34,10 +34,10 @@ describe('OrgCitationBibtex', function()
     it('should accept an array of bibliography paths', function()
       local source = OrgCitationBibtex:new({ files = nil })
       local config = require('orgmode.config')
-      local old = config.citations.bibliography
-      config.citations.bibliography = { refs_bib, extra_bib }
+      local old = config.citations.org_cite_global_bibliography
+      config.citations.org_cite_global_bibliography = { refs_bib, extra_bib }
       local items = source:get_items()
-      config.citations.bibliography = old
+      config.citations.org_cite_global_bibliography = old
 
       local keys = vim.tbl_map(function(i)
         return i.key
@@ -49,10 +49,10 @@ describe('OrgCitationBibtex', function()
     it('should return empty list when no bibliography is configured', function()
       local source = OrgCitationBibtex:new({ files = nil })
       local config = require('orgmode.config')
-      local old = config.citations.bibliography
-      config.citations.bibliography = nil
+      local old = config.citations.org_cite_global_bibliography
+      config.citations.org_cite_global_bibliography = nil
       local items = source:get_items()
-      config.citations.bibliography = old
+      config.citations.org_cite_global_bibliography = old
       assert.are.same(0, #items)
     end)
   end)
@@ -69,10 +69,10 @@ describe('OrgCitationBibtex', function()
       local source = OrgCitationBibtex:new({ files = require('orgmode').files })
 
       local config = require('orgmode.config')
-      local old = config.citations.bibliography
-      config.citations.bibliography = nil
+      local old = config.citations.org_cite_global_bibliography
+      config.citations.org_cite_global_bibliography = nil
       local items = source:get_items()
-      config.citations.bibliography = old
+      config.citations.org_cite_global_bibliography = old
 
       local keys = vim.tbl_map(function(i)
         return i.key
@@ -91,10 +91,10 @@ describe('OrgCitationBibtex', function()
       local source = OrgCitationBibtex:new({ files = require('orgmode').files })
 
       local config = require('orgmode.config')
-      local old = config.citations.bibliography
-      config.citations.bibliography = extra_bib
+      local old = config.citations.org_cite_global_bibliography
+      config.citations.org_cite_global_bibliography = extra_bib
       local items = source:get_items()
-      config.citations.bibliography = old
+      config.citations.org_cite_global_bibliography = old
 
       local keys = vim.tbl_map(function(i)
         return i.key
@@ -108,10 +108,10 @@ describe('OrgCitationBibtex', function()
     it('should open the .bib file and jump to the entry line', function()
       local source = OrgCitationBibtex:new({ files = nil })
       local config = require('orgmode.config')
-      local old = config.citations.bibliography
-      config.citations.bibliography = refs_bib
+      local old = config.citations.org_cite_global_bibliography
+      config.citations.org_cite_global_bibliography = refs_bib
       local result = source:follow('jones2021')
-      config.citations.bibliography = old
+      config.citations.org_cite_global_bibliography = old
 
       assert.is_true(result)
       -- Verify the current buffer is the bib file and cursor is on the entry
@@ -125,10 +125,10 @@ describe('OrgCitationBibtex', function()
     it('should return false for an unknown key', function()
       local source = OrgCitationBibtex:new({ files = nil })
       local config = require('orgmode.config')
-      local old = config.citations.bibliography
-      config.citations.bibliography = refs_bib
+      local old = config.citations.org_cite_global_bibliography
+      config.citations.org_cite_global_bibliography = refs_bib
       local result = source:follow('nosuchkey_xyz')
-      config.citations.bibliography = old
+      config.citations.org_cite_global_bibliography = old
       assert.is_false(result)
     end)
   end)
