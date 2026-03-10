@@ -2651,13 +2651,10 @@ require('orgmode').setup({
 :PROPERTIES:
 :CUSTOM_ID: citations-zotero-local-api
 :END:
-[[https://www.zotero.org][Zotero]] exposes a local HTTP API on =http://127.0.0.1:23119= (requires the
+[[https://www.zotero.org][Zotero]] exposes a local HTTP API on =http://localhost:23119= (requires the
 Zotero desktop application to be running).  The example below defines a
 custom source that queries the local API for all library items and exposes
-their citation keys for completion.  It requires the
-[[https://retorque.re/zotero-better-bibtex/][Better BibTeX]] Zotero plugin, which adds a stable =citekey= field to each
-item, and caches results so repeated completion calls are cheap.
-
+their citation keys for completion.
 #+begin_src lua
 local ZoteroSource = {}
 
@@ -2666,46 +2663,8 @@ function ZoteroSource:get_name()
 end
 
 function ZoteroSource:get_items()
-  -- Better BibTeX search endpoint — returns JSON array of {citekey, ...}
-  local url = 'http://127.0.0.1:23119/better-bibtex/cayw?format=json&all=1'
-  local ok, result = pcall(vim.fn.system, { 'curl', '-s', url })
-  if not ok or vim.v.shell_error ~= 0 then
-    return {}
-  end
-  local data = vim.json.decode(result or '') or {}
-  local items = {}
-  for _, entry in ipairs(data) do
-    if entry.citekey then
-      table.insert(items, {
-        key = entry.citekey,
-        description = entry.title,
-      })
-    end
-  end
-  return items
-end
-
-require('orgmode').setup({
-  citations = {
-    sources = { ZoteroSource },
-  },
-})
-#+end_src
-
-For a simpler approach that does not require Better BibTeX, query the standard
-Zotero items endpoint and derive a key from the built-in Zotero item key:
-
-#+begin_src lua
-local ZoteroSimpleSource = {}
-
-function ZoteroSimpleSource:get_name()
-  return 'zotero_simple'
-end
-
-function ZoteroSimpleSource:get_items()
   -- Replace 0 with your numeric Zotero user ID if needed.
-  -- Increase the limit or add ?start= pagination for large libraries.
-  local url = 'http://127.0.0.1:23119/api/users/0/items?format=json&limit=100'
+  local url = 'http://localhost:23119/api/users/0/items?format=json'
   local ok, result = pcall(vim.fn.system, { 'curl', '-s', url })
   if not ok or vim.v.shell_error ~= 0 then
     return {}
@@ -2714,12 +2673,12 @@ function ZoteroSimpleSource:get_items()
   local items = {}
   for _, entry in ipairs(data) do
     local d = entry.data or {}
-    if d.key then
+    if d.citationKey then
       local creators = d.creators or {}
       local author = (creators[1] or {}).lastName or ''
       local year = (d.date or ''):match('%d%d%d%d') or ''
       table.insert(items, {
-        key = d.key,
+        key = d.citationKey,
         description = author .. year .. ' ' .. (d.title or ''),
       })
     end
@@ -2729,7 +2688,7 @@ end
 
 require('orgmode').setup({
   citations = {
-    sources = { ZoteroSimpleSource },
+    sources = { ZoteroSource },
   },
 })
 #+end_src
