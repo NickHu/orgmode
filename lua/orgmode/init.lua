@@ -62,7 +62,7 @@ function Org:init()
     })
     :load_sync(true, 20000)
   self.links = require('orgmode.org.links'):new({ files = self.files })
-  self.citations = require('orgmode.org.citations'):new()
+  self.citations = require('orgmode.org.citations'):new({ files = self.files })
   self.agenda = require('orgmode.agenda'):new({
     files = self.files,
     highlighter = self.highlighter,

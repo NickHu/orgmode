@@ -10,7 +10,9 @@ function OrgCompletionCitations:new(opts)
     completion = opts.completion,
     -- Match [cite: or [cite/style: followed by optional text, then @ and the
     -- in-progress key.  \zs marks the start of the completion base.
-    pattern = vim.regex([[\[cite[/:][^\]]*@\zs[^ \]]*$]]),
+    -- Use level-1 long string [=[ ]=] to avoid the Lua long-string ]] terminator
+    -- being triggered by \]] inside the Vim character class [^\]].
+    pattern = vim.regex([=[\[cite[/:][^\]]*@\zs[^ \]]*$]=]),
   }, OrgCompletionCitations)
 end
 

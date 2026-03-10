@@ -3,14 +3,19 @@ local ts_utils = require('orgmode.utils.treesitter')
 ---@class OrgCitations
 ---@field private sources OrgCitationSource[]
 ---@field private sources_by_name table<string, OrgCitationSource>
+---@field private files OrgFiles | nil
 local OrgCitations = {}
 OrgCitations.__index = OrgCitations
 
-function OrgCitations:new()
+---@param opts? { files?: OrgFiles }
+function OrgCitations:new(opts)
+  opts = opts or {}
   local this = setmetatable({
     sources = {},
     sources_by_name = {},
+    files = opts.files,
   }, OrgCitations)
+  this:_setup_builtin_sources()
   this:_add_custom_sources()
   return this
 end
@@ -89,6 +94,11 @@ function OrgCitations:_at_cursor_pattern()
 
   local key_suffix = after_cursor:match('^([^%s%]%;,@]*)')
   return key_prefix .. (key_suffix or '')
+end
+
+---@private
+function OrgCitations:_setup_builtin_sources()
+  self:add_source(require('orgmode.org.citations.bibtex'):new({ files = self.files }))
 end
 
 ---@private
